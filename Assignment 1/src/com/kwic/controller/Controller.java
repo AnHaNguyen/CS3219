@@ -1,60 +1,28 @@
 package com.kwic.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 
 public class Controller {
 	public static final String SPACE = " ";
 	public static final String EXIT = "exit";
 	
-	public static void main(String args[]){
-		Scanner sc = new Scanner(System.in);
-		//receive words to ignore
-		List<String> ignoreWords = new ArrayList<String>();
-		String input = null;
-		while (sc.hasNext()){
-			input = sc.nextLine();
-			//input has more than 1 word => end of words to ignore input
-			if (input.split(SPACE).length == 1){
-				ignoreWords.add(input);
-			} else {
-				break;
-			}
-		}
-		//receive input lines
-		List<String> inputLines = new ArrayList<>(Arrays.asList(input));
-		while (sc.hasNext()){
-			input = sc.nextLine();
-			if (!input.equalsIgnoreCase(EXIT)){
-				inputLines.add(input);
-			} else {
-				break;
-			}
-		}
-		List<String> indexLines = generateKWICIndexLines(ignoreWords, inputLines);	
-//		print(ignoreWords);
-//		print(inputLines);
-		print(indexLines);
-		sc.close();
+	/**
+	 * default constructor
+	 */
+	public Controller(){
+		
 	}
-	
-	// used to print out a list of String
-	private static void print(List<String> list){
-		list.stream().forEach(System.out::println);
-		System.out.println();
-	}
-	
+
 	/**
 	 * generate kwic index lines from input lines given the ignore words
 	 * @param ignoreWords
 	 * @param inputLines
 	 * @return List of KWIC Index Lines
 	 */
-	private static List<String> generateKWICIndexLines(
+	public List<String> generateKWICIndexLines(
 			List<String> ignoreWords, List<String> inputLines){
 		List<String> kwicIndexLines = new ArrayList<>();
 		for (int i = 0; i < inputLines.size(); i++) {
