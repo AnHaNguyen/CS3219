@@ -1,0 +1,7 @@
+# eclipse generated files
+.classpath
+.settings/
+
+#java class files
+*.class
+
