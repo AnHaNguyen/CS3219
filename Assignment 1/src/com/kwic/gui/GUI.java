@@ -66,13 +66,23 @@ public class GUI extends JFrame {
 		setBounds(100, 100, 500, 650);
 		contentPane.setLayout(null);
 		
-		final JTextArea ignoreWordArea = new JTextArea("Input Ignore Words below:");
+		JTextArea ignoreWordsDisplay = new JTextArea();
+		ignoreWordsDisplay.setEditable(false);
+		ignoreWordsDisplay.setBounds(0, 210, 500, 50);
+		contentPane.add(ignoreWordsDisplay);
+		
+		JTextArea inputLinesDisplay = new JTextArea();
+		inputLinesDisplay.setEditable(false);
+		inputLinesDisplay.setBounds(0, 260, 500, 50);
+		contentPane.add(inputLinesDisplay);
+		
+		JTextArea ignoreWordArea = new JTextArea("Input Ignore Words below:");
 		ignoreWordArea.setBounds(0, 0, 500, 20);
 		ignoreWordArea.setEditable(false);
 		ignoreWordArea.setBackground(java.awt.Color.lightGray);
 		contentPane.add(ignoreWordArea);
 
-		final JTextField ignoreWordText = new JTextField();
+		JTextField ignoreWordText = new JTextField();
 		ignoreWordText.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent event) {
 				if (event.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -80,6 +90,7 @@ public class GUI extends JFrame {
 					if (input != null && !input.equals("")) {
 						ignoreWords.add(input);
 					}
+					displayIgnoreWords(ignoreWordsDisplay);
 					ignoreWordText.setText("");
 				}
 			}
@@ -87,13 +98,13 @@ public class GUI extends JFrame {
 		ignoreWordText.setBounds(0, 20, 350, 50);
 		contentPane.add(ignoreWordText);
 		
-		final JTextArea inputLineArea = new JTextArea("Input Lines below:");
+		JTextArea inputLineArea = new JTextArea("Input Lines below:");
 		inputLineArea.setEditable(false);
 		inputLineArea.setBounds(0, 80, 500, 20);
 		inputLineArea.setBackground(java.awt.Color.lightGray);
 		contentPane.add(inputLineArea);
 		
-		final JTextField inputLineText = new JTextField();
+		JTextField inputLineText = new JTextField();
 		inputLineText.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent event) {
 				if (event.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -101,6 +112,7 @@ public class GUI extends JFrame {
 					if (input != null && !input.equals("")) {
 						inputLines.add(input);
 					}
+					displayInputLines(inputLinesDisplay);
 					inputLineText.setText("");
 				}
 			}
@@ -115,12 +127,13 @@ public class GUI extends JFrame {
 				if (input != null && !input.equals("")) {
 					ignoreWords.add(input);
 				}
+				displayIgnoreWords(ignoreWordsDisplay);
 				ignoreWordText.setText("");
 			}
 		});
 		ignoreWordButton.setBounds(350, 20, 150, 50);
 		contentPane.add(ignoreWordButton);
-		
+	
 		JButton inputLineButton = new JButton("Add Input Lines");
 		inputLineButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -128,17 +141,18 @@ public class GUI extends JFrame {
 				if (input != null && !input.equals("")) {
 					inputLines.add(input);
 				}
+				displayInputLines(inputLinesDisplay);
 				inputLineText.setText("");
 			}
 		});
 		inputLineButton.setBounds(350, 100, 150, 50);
 		contentPane.add(inputLineButton);
 		
-		final JTextArea resultDisplay = new JTextArea();
-		resultDisplay.setFont(new Font("Result", Font.BOLD, 20));
+		JTextArea resultDisplay = new JTextArea();
+		resultDisplay.setFont(new Font("Result", Font.BOLD, 18));
 		resultDisplay.setEditable(false);
 		resultDisplay.setBackground(java.awt.Color.lightGray);
-		resultDisplay.setBounds(0, 210, 500, 390);
+		resultDisplay.setBounds(0, 310, 500, 340);
 		contentPane.add(resultDisplay);
 		
 		JButton submitButton = new JButton("Find KWIC Lines");
@@ -146,7 +160,7 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				KWICLines = controller.generateKWICIndexLines(
 						ignoreWords, inputLines);
-				String outputStr = "";
+				String outputStr = "KWIC Lines generated:" + NEW_LINES + NEW_LINES;
 				for (int i = 0; i < KWICLines.size(); i++) {
 					outputStr = outputStr.concat(KWICLines.get(i) + NEW_LINES);
 				}
@@ -155,5 +169,21 @@ public class GUI extends JFrame {
 		});
 		submitButton.setBounds(160, 170, 170, 30);
 		contentPane.add(submitButton);
+	}
+	
+	private static void displayIgnoreWords(JTextArea area) {
+		String displayStr = "Ignore words: " + NEW_LINES;
+		for (int i = 0; i < ignoreWords.size(); i++) {
+			displayStr += ignoreWords.get(i) + ", ";
+		}
+		area.setText(displayStr);
+	}
+	
+	private static void displayInputLines(JTextArea area) {
+		String displayStr = "Input Lines: " + NEW_LINES;
+		for (int i = 0; i < inputLines.size(); i++) {
+			displayStr += inputLines.get(i) + ", ";
+		}
+		area.setText(displayStr);
 	}
 }
