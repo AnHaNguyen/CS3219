@@ -157,8 +157,8 @@ public class GUI extends JFrame {
 		
 		JButton submitButton = new JButton("Find KWIC Lines");
 		submitButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				KWICLines = controller.generateKWICIndexLines(
+			public void actionPerformed(ActionEvent event) {
+				KWICLines = controller.generateKWICIndexLinesByPipelineAndFilters(
 						ignoreWords, inputLines);
 				String outputStr = "KWIC Lines generated:" + NEW_LINES + NEW_LINES;
 				for (int i = 0; i < KWICLines.size(); i++) {
@@ -169,9 +169,22 @@ public class GUI extends JFrame {
 		});
 		submitButton.setBounds(160, 170, 170, 30);
 		contentPane.add(submitButton);
+	
+		JButton resetButton = new JButton("Reset");
+		resetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				ignoreWords.clear();
+				inputLines.clear();
+				displayIgnoreWords(ignoreWordsDisplay);
+				displayInputLines(inputLinesDisplay);
+			}
+		});
+		resetButton.setBounds(350,170, 100, 30);
+		contentPane.add(resetButton);
 	}
 	
 	private static void displayIgnoreWords(JTextArea area) {
+		ignoreWords = controller.preprocessIgnoreWords(ignoreWords);
 		String displayStr = "Ignore words: " + NEW_LINES;
 		for (int i = 0; i < ignoreWords.size(); i++) {
 			displayStr += ignoreWords.get(i) + ", ";
@@ -180,6 +193,7 @@ public class GUI extends JFrame {
 	}
 	
 	private static void displayInputLines(JTextArea area) {
+		inputLines = controller.preprocessInputLines(inputLines);
 		String displayStr = "Input Lines: " + NEW_LINES;
 		for (int i = 0; i < inputLines.size(); i++) {
 			displayStr += inputLines.get(i) + ", ";
