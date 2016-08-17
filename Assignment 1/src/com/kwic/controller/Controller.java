@@ -1,5 +1,8 @@
 package com.kwic.controller;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,12 +11,26 @@ import java.util.stream.Collectors;
 
 public class Controller {
 	public static final String SPACE = " ";
+	public static final String pathToIgnoreWordsFile = "ignore-words.txt";
+	public static final String pathToInputLinesFile = "input-lines.txt";
 	
 	/**
 	 * default constructor
 	 */
 	public Controller(){}
-
+	
+	public static void main(String[] args) {
+		Controller controller = new Controller();
+		List<String> ignoreWords = controller.importFromFile(pathToIgnoreWordsFile);
+		ignoreWords = controller.preprocessIgnoreWords(ignoreWords);
+		List<String> inputLines = controller.importFromFile(pathToInputLinesFile);
+		inputLines = controller.preprocessInputLines(inputLines);
+		List<String> KWICIndexes = controller
+				.generateKWICIndexLinesByPipelineAndFilters(
+						ignoreWords, inputLines);
+		KWICIndexes.forEach(System.out::println);
+	}
+	
 	/**
 	 * generate kwic index lines from input lines given the ignore words
 	 * @param ignoreWords
@@ -26,30 +43,6 @@ public class Controller {
 		List<String> unorderedKWICIndexLines = removeIgnoredLines(shiftedInputLines, ignoreWords);
 		List<String> KWICIndexLines = alphabetize(unorderedKWICIndexLines);
 		return KWICIndexLines;
-	}
-	
-	/** 
-	 * preprocess the input lines to trim and remove unnecessary spaces
-	 * @param inputLines
-	 * @return list of input lines after preprocessing
-	 */
-	public List<String> preprocessInputLines(List<String> inputLines) {
-		return inputLines.stream().map(line -> preprocessLine(line)).collect(Collectors.toList());
-	}
-	
-	private String preprocessLine(String line) {
-		return line.trim().replaceAll(" +", SPACE);
-	}
-	/**
-	 * preprocess ignore words to remove invalid words and trim
-	 * @param ignoreWords
-	 * @return list of ignore words after preprocessing
-	 */
-	public List<String> preprocessIgnoreWords(List<String> ignoreWords) {
-		return ignoreWords.stream()
-				.map(word -> word.trim())
-				.filter(word -> word.split(SPACE).length == 1)
-				.collect(Collectors.toList());
 	}
 	
 	/**
@@ -113,5 +106,51 @@ public class Controller {
 	private static List<String> alphabetize(List<String> list) {
 		Collections.sort(list);
 		return list;
+	}
+	
+	/**
+	 * read Data from a file
+	 * @param source
+	 * @return data in a file as List of String
+	 */
+	public List<String> importFromFile(String source) {
+		List<String> data = new ArrayList<>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(source));
+			String curLine;
+			while ((curLine = br.readLine()) != null) {
+				data.add(curLine);
+			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Cannot import from files");
+		}
+		return data;
+	}
+	
+	/** 
+	 * preprocess the input lines to trim and remove unnecessary spaces
+	 * @param inputLines
+	 * @return list of input lines after preprocessing
+	 */
+	public List<String> preprocessInputLines(List<String> inputLines) {
+		return inputLines.stream().map(line -> preprocessLine(line)).collect(Collectors.toList());
+	}
+	
+	private String preprocessLine(String line) {
+		return line.trim().replaceAll(" +", SPACE);
+	}
+	
+	/**
+	 * preprocess ignore words to remove invalid words and trim
+	 * @param ignoreWords
+	 * @return list of ignore words after preprocessing
+	 */
+	public List<String> preprocessIgnoreWords(List<String> ignoreWords) {
+		return ignoreWords.stream()
+				.map(word -> word.trim())
+				.filter(word -> word.split(SPACE).length == 1)
+				.collect(Collectors.toList());
 	}
 }

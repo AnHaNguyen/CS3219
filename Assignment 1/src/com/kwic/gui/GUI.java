@@ -26,6 +26,7 @@ public class GUI extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	public static final String NEW_LINES = System.getProperty("line.separator");
+	
 	private JPanel contentPane;
 	private static Controller controller;
 	private static List<String> ignoreWords;
@@ -76,6 +77,13 @@ public class GUI extends JFrame {
 		inputLinesDisplay.setBounds(0, 260, 500, 50);
 		contentPane.add(inputLinesDisplay);
 		
+		JTextArea resultDisplay = new JTextArea();
+		resultDisplay.setFont(new Font("Result", Font.BOLD, 18));
+		resultDisplay.setEditable(false);
+		resultDisplay.setBackground(java.awt.Color.lightGray);
+		resultDisplay.setBounds(0, 310, 500, 340);
+		contentPane.add(resultDisplay);
+	
 		JTextArea ignoreWordArea = new JTextArea("Input Ignore Words below:");
 		ignoreWordArea.setBounds(0, 0, 500, 20);
 		ignoreWordArea.setEditable(false);
@@ -92,10 +100,11 @@ public class GUI extends JFrame {
 					}
 					displayIgnoreWords(ignoreWordsDisplay);
 					ignoreWordText.setText("");
+					submit(resultDisplay);
 				}
 			}
 		});
-		ignoreWordText.setBounds(0, 20, 350, 50);
+		ignoreWordText.setBounds(0, 20, 500, 50);
 		contentPane.add(ignoreWordText);
 		
 		JTextArea inputLineArea = new JTextArea("Input Lines below:");
@@ -114,61 +123,12 @@ public class GUI extends JFrame {
 					}
 					displayInputLines(inputLinesDisplay);
 					inputLineText.setText("");
+					submit(resultDisplay);
 				}
 			}
 		});
-		inputLineText.setBounds(0, 100, 350, 50);
+		inputLineText.setBounds(0, 100, 500, 50);
 		contentPane.add(inputLineText);
-		
-		JButton ignoreWordButton = new JButton("Add Ignore Word");
-		ignoreWordButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				String input = ignoreWordText.getText();
-				if (input != null && !input.equals("")) {
-					ignoreWords.add(input);
-				}
-				displayIgnoreWords(ignoreWordsDisplay);
-				ignoreWordText.setText("");
-			}
-		});
-		ignoreWordButton.setBounds(350, 20, 150, 50);
-		contentPane.add(ignoreWordButton);
-	
-		JButton inputLineButton = new JButton("Add Input Lines");
-		inputLineButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				String input = inputLineText.getText();
-				if (input != null && !input.equals("")) {
-					inputLines.add(input);
-				}
-				displayInputLines(inputLinesDisplay);
-				inputLineText.setText("");
-			}
-		});
-		inputLineButton.setBounds(350, 100, 150, 50);
-		contentPane.add(inputLineButton);
-		
-		JTextArea resultDisplay = new JTextArea();
-		resultDisplay.setFont(new Font("Result", Font.BOLD, 18));
-		resultDisplay.setEditable(false);
-		resultDisplay.setBackground(java.awt.Color.lightGray);
-		resultDisplay.setBounds(0, 310, 500, 340);
-		contentPane.add(resultDisplay);
-		
-		JButton submitButton = new JButton("Find KWIC Lines");
-		submitButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				KWICLines = controller.generateKWICIndexLinesByPipelineAndFilters(
-						ignoreWords, inputLines);
-				String outputStr = "KWIC Lines generated:" + NEW_LINES + NEW_LINES;
-				for (int i = 0; i < KWICLines.size(); i++) {
-					outputStr = outputStr.concat(KWICLines.get(i) + NEW_LINES);
-				}
-				resultDisplay.setText(outputStr);
-			}
-		});
-		submitButton.setBounds(160, 170, 170, 30);
-		contentPane.add(submitButton);
 	
 		JButton resetButton = new JButton("Reset");
 		resetButton.addActionListener(new ActionListener() {
@@ -177,10 +137,26 @@ public class GUI extends JFrame {
 				inputLines.clear();
 				displayIgnoreWords(ignoreWordsDisplay);
 				displayInputLines(inputLinesDisplay);
+				submit(resultDisplay);
 			}
 		});
 		resetButton.setBounds(350,170, 100, 30);
 		contentPane.add(resetButton);
+		
+		JButton importButton = new JButton("Import from files");
+		importButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				ignoreWords = controller.importFromFile(
+						Controller.pathToIgnoreWordsFile);
+				inputLines = controller.importFromFile(
+						Controller.pathToInputLinesFile);
+				displayIgnoreWords(ignoreWordsDisplay);
+				displayInputLines(inputLinesDisplay);
+				submit(resultDisplay);
+			}
+		});
+		importButton.setBounds(160, 170, 170, 30);
+		contentPane.add(importButton);
 	}
 	
 	private static void displayIgnoreWords(JTextArea area) {
@@ -199,5 +175,15 @@ public class GUI extends JFrame {
 			displayStr += inputLines.get(i) + ", ";
 		}
 		area.setText(displayStr);
+	}
+	
+	private void submit(JTextArea resultDisplay) {
+		KWICLines = controller.generateKWICIndexLinesByPipelineAndFilters(
+				ignoreWords, inputLines);
+		String outputStr = "KWIC Lines generated:" + NEW_LINES + NEW_LINES;
+		for (int i = 0; i < KWICLines.size(); i++) {
+			outputStr = outputStr.concat(KWICLines.get(i) + NEW_LINES);
+		}
+		resultDisplay.setText(outputStr);
 	}
 }
