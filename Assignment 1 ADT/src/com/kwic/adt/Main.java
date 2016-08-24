@@ -19,8 +19,8 @@ class Input {
 	private static ArrayList<String> ignoreLine = new ArrayList<String>();
 	private static ArrayList<String> ignoreList = new ArrayList<String>();
 	private Scanner sc = new Scanner(System.in);
-	private String ignoreFile = "Ignore.txt";
-	private String lineFile = "Line.txt";
+	private String ignoreFile = "ignore.txt";
+	private String lineFile = "line.txt";
 
 	public Input() {
 	
@@ -149,9 +149,25 @@ class AlphabeticShift {
 
 // This class outputs the lines
 class Output {
+	private String outputFile = "output.txt";
+	ArrayList<String> outputList = new ArrayList<String>();
 	public Output(AlphabeticShift as) {
-		for (int i = 0; i < as.getAlphabetic().size(); i++) {
-			System.out.println(as.getAlphabetic().get(i));
+		outputList = as.getAlphabetic();
+		writeOutput();
+		System.out.println("The output iswritten to Output.txt. Task completed!");
+	}
+	
+	private void writeOutput() {
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(outputFile, "UTF-8");
+			for (int i = 0; i < outputList.size(); i++) {
+				System.out.println(outputList.get(i));
+				writer.println(outputList.get(i));
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
