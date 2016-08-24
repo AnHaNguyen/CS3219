@@ -28,7 +28,6 @@ public class GUI extends JFrame {
 	public static final String NEW_LINES = System.getProperty("line.separator");
 	
 	private JPanel contentPane;
-	private static Controller controller;
 	private static List<String> ignoreWords;
 	private static List<String> inputLines;
 	private static List<String> KWICLines;
@@ -38,7 +37,6 @@ public class GUI extends JFrame {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
-		controller = new Controller();
 		ignoreWords = new ArrayList<>();
 		inputLines = new ArrayList<>();
 		KWICLines = new ArrayList<>();
@@ -146,9 +144,9 @@ public class GUI extends JFrame {
 		JButton importButton = new JButton("Import from files");
 		importButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				ignoreWords = controller.importFromFile(
+				ignoreWords = Controller.importFromFile(
 						Controller.pathToIgnoreWordsFile);
-				inputLines = controller.importFromFile(
+				inputLines = Controller.importFromFile(
 						Controller.pathToInputLinesFile);
 				displayIgnoreWords(ignoreWordsDisplay);
 				displayInputLines(inputLinesDisplay);
@@ -160,7 +158,7 @@ public class GUI extends JFrame {
 	}
 	
 	private static void displayIgnoreWords(JTextArea area) {
-		ignoreWords = controller.preprocessIgnoreWords(ignoreWords);
+		ignoreWords = Controller.preprocessIgnoreWords(ignoreWords);
 		String displayStr = "Ignore words: " + NEW_LINES;
 		for (int i = 0; i < ignoreWords.size(); i++) {
 			displayStr += ignoreWords.get(i) + ", ";
@@ -169,7 +167,7 @@ public class GUI extends JFrame {
 	}
 	
 	private static void displayInputLines(JTextArea area) {
-		inputLines = controller.preprocessInputLines(inputLines);
+		inputLines = Controller.preprocessInputLines(inputLines);
 		String displayStr = "Input Lines: " + NEW_LINES;
 		for (int i = 0; i < inputLines.size(); i++) {
 			displayStr += inputLines.get(i) + ", ";
@@ -178,9 +176,9 @@ public class GUI extends JFrame {
 	}
 	
 	private void submit(JTextArea resultDisplay) {
-		KWICLines = controller.generateKWICIndexLinesByPipelineAndFilters(
+		KWICLines = Controller.generateKWICIndexLinesByPipelineAndFilters(
 				ignoreWords, inputLines);
-		controller.outputToFile(KWICLines, Controller.pathToOutputFile);
+		Controller.outputToFile(KWICLines, Controller.pathToOutputFile);
 		String outputStr = "KWIC Lines generated:" + NEW_LINES + NEW_LINES;
 		for (int i = 0; i < KWICLines.size(); i++) {
 			outputStr = outputStr.concat(KWICLines.get(i) + NEW_LINES);

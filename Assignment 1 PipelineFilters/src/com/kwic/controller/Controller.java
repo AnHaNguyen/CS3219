@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,16 +24,15 @@ public class Controller {
 	public Controller(){}
 	
 	public static void main(String[] args) {
-		Controller controller = new Controller();
-		List<String> ignoreWords = controller.importFromFile(pathToIgnoreWordsFile);
-		ignoreWords = controller.preprocessIgnoreWords(ignoreWords);
-		List<String> inputLines = controller.importFromFile(pathToInputLinesFile);
-		inputLines = controller.preprocessInputLines(inputLines);
-		List<String> KWICIndexes = controller
+		List<String> ignoreWords = Controller.importFromFile(pathToIgnoreWordsFile);
+		ignoreWords = Controller.preprocessIgnoreWords(ignoreWords);
+		List<String> inputLines = Controller.importFromFile(pathToInputLinesFile);
+		inputLines = Controller.preprocessInputLines(inputLines);
+		List<String> KWICIndexes = Controller
 				.generateKWICIndexLinesByPipelineAndFilters(
 						ignoreWords, inputLines);
-//		KWICIndexes.forEach(System.out::println);
-		controller.outputToFile(KWICIndexes, pathToOutputFile);
+		KWICIndexes.forEach(System.out::println);
+		Controller.outputToFile(KWICIndexes, pathToOutputFile);
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class Controller {
 	 * @param inputLines
 	 * @return List of KWIC Index Lines
 	 */
-	public List<String> generateKWICIndexLinesByPipelineAndFilters(
+	public static List<String> generateKWICIndexLinesByPipelineAndFilters(
 			List<String> ignoreWords, List<String> inputLines){	
 		List<String> shiftedInputLines = circularShift(inputLines);
 		List<String> unorderedKWICIndexLines = removeIgnoredLines(shiftedInputLines, ignoreWords);
@@ -54,7 +54,7 @@ public class Controller {
 	 * @param list
 	 * @return a list containing circular shifts of all members
 	 */
-	private List<String> circularShift(List<String> list) {
+	private static List<String> circularShift(List<String> list) {
 		List<String> circularShiftedList = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
 			String line = list.get(i);
@@ -93,14 +93,23 @@ public class Controller {
 		List<String> KWICIndexesLines = new ArrayList<>();
 		for (int i = 0; i < inputLines.size(); i++) {
 			String curLine = inputLines.get(i);
-			String firstWord = curLine.split(SPACE)[0];
-			String firstLetter = firstWord.substring(0, 1);
-			if (ignoreWords.stream()
-					.filter(word -> word.equalsIgnoreCase(firstWord))
-					.count() == 0) { 		//if firstWord is not in ignore words
-				curLine = curLine.replaceFirst(
-						firstLetter, firstLetter.toUpperCase());
-				KWICIndexesLines.add(curLine);
+			String[] tokens = curLine.split(SPACE);
+			boolean isRemove = false;
+			for (int j = 0; j < tokens.length; j++) {
+				if (isIgnoreWord(tokens[j], ignoreWords)) {
+					if (j != 0) {
+						tokens[j] = tokens[j].toLowerCase();
+					} else {
+						isRemove = true;
+					}
+				} else {
+					tokens[j] = tokens[j].substring(0, 1).toUpperCase() 
+							+ tokens[j].substring(1).toLowerCase();
+				}
+			}
+			if (!isRemove) {
+				KWICIndexesLines.add(Arrays
+						.stream(tokens).collect(Collectors.joining(SPACE)));
 			}
 		}
 		return KWICIndexesLines;
@@ -121,7 +130,7 @@ public class Controller {
 	 * @param source
 	 * @return data in a file as List of String
 	 */
-	public List<String> importFromFile(String source) {
+	public static List<String> importFromFile(String source) {
 		List<String> data = new ArrayList<>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(source));
@@ -142,11 +151,11 @@ public class Controller {
 	 * @param inputLines
 	 * @return list of input lines after preprocessing
 	 */
-	public List<String> preprocessInputLines(List<String> inputLines) {
+	public static List<String> preprocessInputLines(List<String> inputLines) {
 		return inputLines.stream().map(line -> preprocessLine(line)).collect(Collectors.toList());
 	}
 	
-	private String preprocessLine(String line) {
+	private static String preprocessLine(String line) {
 		return line.trim().replaceAll(" +", SPACE);
 	}
 	
@@ -155,7 +164,7 @@ public class Controller {
 	 * @param ignoreWords
 	 * @return list of ignore words after preprocessing
 	 */
-	public List<String> preprocessIgnoreWords(List<String> ignoreWords) {
+	public static List<String> preprocessIgnoreWords(List<String> ignoreWords) {
 		return ignoreWords.stream()
 				.map(word -> word.trim())
 				.filter(word -> word.split(SPACE).length == 1)
@@ -165,7 +174,7 @@ public class Controller {
 	/**
 	 * output the result to a file
 	 */
-	public void outputToFile(List<String> kwicIndexes, String filePath) {
+	public static void outputToFile(List<String> kwicIndexes, String filePath) {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
 			for (int i = 0; i < kwicIndexes.size(); i++) {
@@ -176,5 +185,14 @@ public class Controller {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * check if a word is in list of ignore words
+	 */
+	public static boolean isIgnoreWord(String word, List<String> ignoreWords) {
+		return (ignoreWords.stream()
+		.filter(ignoreWord -> ignoreWord.equalsIgnoreCase(word))
+		.count() != 0);
 	}
 }
