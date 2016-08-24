@@ -3,25 +3,36 @@ package com.kwic.adt;
 import java.util.*;
 import java.io.*;
 
+//Main Class where the high-level components are called
 public class Main {
 	public static void main(String[] args) {
 		Input ip = new Input();
 		CircularShift cs = new CircularShift(ip);
 		AlphabeticShift as = new AlphabeticShift(cs);
-		for (int i = 0; i < as.getAlphabetic().size(); i++) {
-			System.out.println(as.getAlphabetic().get(i));
-		}
+		new Output(as);
 	}
 }
 
+// This class processes the input and populates the data structures
 class Input {
 	private static ArrayList<String> lineList = new ArrayList<String>();
 	private static ArrayList<String> ignoreLine = new ArrayList<String>();
 	private static ArrayList<String> ignoreList = new ArrayList<String>();
+	private Scanner sc = new Scanner(System.in);
+	private String ignoreFile = "Ignore.txt";
+	private String lineFile = "Line.txt";
 
 	public Input() {
-		readData("Input.txt", lineList);
-		readData("Ignore.txt", ignoreLine);
+	
+		System.out.println("Defaul input files are under the current program's folder");
+		System.out.println("Would you like to specify input paths? (Y/N)");
+		if (sc.nextLine().toUpperCase().equals("Y")) {
+			ignoreFile = setIgnorePath(ignoreFile);
+			lineFile = setLinePath(lineFile);
+		}
+		
+		readData(ignoreFile, ignoreLine);
+		readData(lineFile, lineList);
 
 		String currentIgnoreLine;
 		for (int i = 0; i < ignoreLine.size(); i++) {
@@ -31,6 +42,28 @@ class Input {
 				ignoreList.add(st.nextToken().toLowerCase());
 			}
 		}
+	}
+
+	private String setIgnorePath(String ignoreFile) {
+		while (true) {
+			System.out.println("Please specify path for ignore words file:");
+			if (sc.hasNext()) {
+				ignoreFile = sc.nextLine();
+				break;
+			}
+		}
+		return ignoreFile;
+	}
+	
+	private String setLinePath(String lineFile) {
+		while (true) {
+			System.out.println("Please specify path for line file:");
+			if (sc.hasNext()) {
+				lineFile = sc.nextLine();
+				break;
+			}
+		}
+		return lineFile;
 	}
 
 	private void readData(String path, ArrayList<String> array) {
@@ -55,6 +88,7 @@ class Input {
 	}
 }
 
+// This class conducts the circular shift of the lines
 class CircularShift {
 	private static ArrayList<String> circularLineList = new ArrayList<String>();
 	private static ArrayList<String> ignoreList = new ArrayList<String>();
@@ -88,8 +122,7 @@ class CircularShift {
 			for (int j = 0; j < keyWordList.size(); j++) {
 				String currentKeyWord = keyWordList.get(j);
 				String capFirstLetter = currentKeyWord.substring(0, 1).toUpperCase() + currentKeyWord.substring(1);
-				circularLineList.set(i, circularLineList.get(i).replaceAll(currentKeyWord, 
-						capFirstLetter));
+				circularLineList.set(i, circularLineList.get(i).replaceAll(currentKeyWord, capFirstLetter));
 			}
 		}
 	}
@@ -100,9 +133,9 @@ class CircularShift {
 
 }
 
+// This class conducts the alphabetical sort of the lines
 class AlphabeticShift {
 	private static ArrayList<String> alphabeticLineList = new ArrayList<String>();
-	private static ArrayList<String> lowerCaseLineList = new ArrayList<String>();
 
 	public AlphabeticShift(CircularShift cs) {
 		alphabeticLineList = cs.getCircular();
@@ -111,5 +144,14 @@ class AlphabeticShift {
 
 	public ArrayList<String> getAlphabetic() {
 		return alphabeticLineList;
+	}
+}
+
+// This class outputs the lines
+class Output {
+	public Output(AlphabeticShift as) {
+		for (int i = 0; i < as.getAlphabetic().size(); i++) {
+			System.out.println(as.getAlphabetic().get(i));
+		}
 	}
 }
