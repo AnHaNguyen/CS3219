@@ -180,6 +180,7 @@ public class GUI extends JFrame {
 	private void submit(JTextArea resultDisplay) {
 		KWICLines = controller.generateKWICIndexLinesByPipelineAndFilters(
 				ignoreWords, inputLines);
+		controller.outputToFile(KWICLines, Controller.pathToOutputFile);
 		String outputStr = "KWIC Lines generated:" + NEW_LINES + NEW_LINES;
 		for (int i = 0; i < KWICLines.size(); i++) {
 			outputStr = outputStr.concat(KWICLines.get(i) + NEW_LINES);

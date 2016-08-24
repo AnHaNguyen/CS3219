@@ -1,7 +1,9 @@
 package com.kwic.controller;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +15,7 @@ public class Controller {
 	public static final String SPACE = " ";
 	public static final String pathToIgnoreWordsFile = "ignore-words.txt";
 	public static final String pathToInputLinesFile = "input-lines.txt";
+	public static final String pathToOutputFile = "output.txt";
 	
 	/**
 	 * default constructor
@@ -28,7 +31,8 @@ public class Controller {
 		List<String> KWICIndexes = controller
 				.generateKWICIndexLinesByPipelineAndFilters(
 						ignoreWords, inputLines);
-		KWICIndexes.forEach(System.out::println);
+//		KWICIndexes.forEach(System.out::println);
+		controller.outputToFile(KWICIndexes, pathToOutputFile);
 	}
 	
 	/**
@@ -88,11 +92,15 @@ public class Controller {
 			List<String> inputLines, List<String> ignoreWords) {
 		List<String> KWICIndexesLines = new ArrayList<>();
 		for (int i = 0; i < inputLines.size(); i++) {
-			String firstWord = inputLines.get(i).split(SPACE)[0];
+			String curLine = inputLines.get(i);
+			String firstWord = curLine.split(SPACE)[0];
+			String firstLetter = firstWord.substring(0, 1);
 			if (ignoreWords.stream()
 					.filter(word -> word.equalsIgnoreCase(firstWord))
 					.count() == 0) { 		//if firstWord is not in ignore words
-				KWICIndexesLines.add(inputLines.get(i));
+				curLine = curLine.replaceFirst(
+						firstLetter, firstLetter.toUpperCase());
+				KWICIndexesLines.add(curLine);
 			}
 		}
 		return KWICIndexesLines;
@@ -152,5 +160,21 @@ public class Controller {
 				.map(word -> word.trim())
 				.filter(word -> word.split(SPACE).length == 1)
 				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * output the result to a file
+	 */
+	public void outputToFile(List<String> kwicIndexes, String filePath) {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
+			for (int i = 0; i < kwicIndexes.size(); i++) {
+				bw.write(kwicIndexes.get(i));
+				bw.newLine();
+			}
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
