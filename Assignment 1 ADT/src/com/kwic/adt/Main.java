@@ -8,7 +8,7 @@ public class Main {
 		Input ip = new Input();
 		CircularShift cs = new CircularShift(ip);
 		AlphabeticShift as = new AlphabeticShift(cs);
-		for (int i =0; i<as.getAlphabetic().size();i++) {
+		for (int i = 0; i < as.getAlphabetic().size(); i++) {
 			System.out.println(as.getAlphabetic().get(i));
 		}
 	}
@@ -22,9 +22,9 @@ class Input {
 	public Input() {
 		readData("Input.txt", lineList);
 		readData("Ignore.txt", ignoreLine);
-		
+
 		String currentIgnoreLine;
-		for (int i = 0; i<ignoreLine.size(); i++){
+		for (int i = 0; i < ignoreLine.size(); i++) {
 			currentIgnoreLine = ignoreLine.get(i).replaceAll(",", "");
 			StringTokenizer st = new StringTokenizer(currentIgnoreLine);
 			while (st.hasMoreTokens()) {
@@ -46,7 +46,7 @@ class Input {
 		}
 	}
 
-	public ArrayList<String> getLine() {
+	public ArrayList<String> getLineList() {
 		return lineList;
 	}
 
@@ -58,26 +58,42 @@ class Input {
 class CircularShift {
 	private static ArrayList<String> circularLineList = new ArrayList<String>();
 	private static ArrayList<String> ignoreList = new ArrayList<String>();
-	
-	public CircularShift (Input ip) {
-		ArrayList<String> lineList = ip.getLine();
+
+	public CircularShift(Input ip) {
+		ArrayList<String> lineList = ip.getLineList();
 		ignoreList = ip.getIgnore();
-		
-		for (int i =0; i<lineList.size(); i++) {
+
+		for (int i = 0; i < lineList.size(); i++) {
 			Shift(lineList.get(i));
 		}
 	}
+
 	private void Shift(String line) {
 		StringTokenizer st = new StringTokenizer(line);
 		String currentToken;
+		ArrayList<String> keyWordList = new ArrayList<String>();
+		int startIndex = 0;
+		if (!circularLineList.isEmpty()) {
+			startIndex = circularLineList.size() - 1;
+		}
 		while (st.hasMoreElements()) {
 			currentToken = st.nextToken();
 			if (!ignoreList.contains(currentToken.toLowerCase())) {
 				circularLineList.add(line);
+				keyWordList.add(currentToken);
 			}
-			line = line.substring(line.indexOf(currentToken)+currentToken.length()+1)+" "+currentToken;
+			line = line.substring(line.indexOf(currentToken) + currentToken.length() + 1) + " " + currentToken;
+		}
+		for (int i = startIndex; i < circularLineList.size(); i++) {
+			for (int j = 0; j < keyWordList.size(); j++) {
+				String currentKeyWord = keyWordList.get(j);
+				String capFirstLetter = currentKeyWord.substring(0, 1).toUpperCase() + currentKeyWord.substring(1);
+				circularLineList.set(i, circularLineList.get(i).replaceAll(currentKeyWord, 
+						capFirstLetter));
+			}
 		}
 	}
+
 	public ArrayList<String> getCircular() {
 		return circularLineList;
 	}
@@ -86,10 +102,13 @@ class CircularShift {
 
 class AlphabeticShift {
 	private static ArrayList<String> alphabeticLineList = new ArrayList<String>();
-	public AlphabeticShift(CircularShift cs){
+	private static ArrayList<String> lowerCaseLineList = new ArrayList<String>();
+
+	public AlphabeticShift(CircularShift cs) {
 		alphabeticLineList = cs.getCircular();
 		Collections.sort(alphabeticLineList);
 	}
+
 	public ArrayList<String> getAlphabetic() {
 		return alphabeticLineList;
 	}
