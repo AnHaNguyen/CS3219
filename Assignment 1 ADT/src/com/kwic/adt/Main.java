@@ -24,7 +24,7 @@ class Input {
 
 	public Input() {
 	
-		System.out.println("Defaul input files are under the current program's folder");
+		System.out.println("Defaul input files should be stored in the program's directory!");
 		System.out.println("Would you like to specify input paths? (Y/N)");
 		if (sc.nextLine().toUpperCase().equals("Y")) {
 			ignoreFile = setIgnorePath(ignoreFile);
@@ -83,7 +83,7 @@ class Input {
 		return lineList;
 	}
 
-	public ArrayList<String> getIgnore() {
+	public ArrayList<String> getIgnoreList() {
 		return ignoreList;
 	}
 }
@@ -95,7 +95,7 @@ class CircularShift {
 
 	public CircularShift(Input ip) {
 		ArrayList<String> lineList = ip.getLineList();
-		ignoreList = ip.getIgnore();
+		ignoreList = ip.getIgnoreList();
 
 		for (int i = 0; i < lineList.size(); i++) {
 			Shift(lineList.get(i));
@@ -127,7 +127,7 @@ class CircularShift {
 		}
 	}
 
-	public ArrayList<String> getCircular() {
+	public ArrayList<String> getCircularList() {
 		return circularLineList;
 	}
 
@@ -138,11 +138,11 @@ class AlphabeticShift {
 	private static ArrayList<String> alphabeticLineList = new ArrayList<String>();
 
 	public AlphabeticShift(CircularShift cs) {
-		alphabeticLineList = cs.getCircular();
+		alphabeticLineList = cs.getCircularList();
 		Collections.sort(alphabeticLineList);
 	}
 
-	public ArrayList<String> getAlphabetic() {
+	public ArrayList<String> getAlphabeticList() {
 		return alphabeticLineList;
 	}
 }
@@ -152,9 +152,12 @@ class Output {
 	private String outputFile = "output.txt";
 	ArrayList<String> outputList = new ArrayList<String>();
 	public Output(AlphabeticShift as) {
-		outputList = as.getAlphabetic();
+		System.out.println("The output is below:");
+		System.out.println();
+		outputList = as.getAlphabeticList();
 		writeOutput();
-		System.out.println("The output iswritten to Output.txt. Task completed!");
+		System.out.println("____________________________________________________");
+		System.out.println("The output is written to Output.txt. Task completed!");
 	}
 	
 	private void writeOutput() {
