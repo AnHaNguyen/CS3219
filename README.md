@@ -7,8 +7,9 @@ This repository combines 2 projects: Assignment 1 ADT and Assignment 1 PipelineF
 
 Assignment 1 ADT:
 -Input: The data would be read from 2 files, which contain words to be ignored and lines to be shifted. By default, the files should be created and stored by users in the same directory with the program under the name “ignore.txt” and “line.txt” respectively. At the start, users are prompted with an option to specify the directory they would want to store their files.
-The ignore words are assumed to be separated by commas or spaces
-The lines are assumed to be separated by new lines
+The ignore words are assumed to be separated by commas or spaces.
+The lines are assumed to be separated by new lines.
+
 -Output: The output will be both displayed on-screen and written to “output.txt” which is created in the current program’s directory.
 
 
